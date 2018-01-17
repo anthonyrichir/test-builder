@@ -1,6 +1,6 @@
 package com.anthonyrichir.test.builder;
 
-import javax.persistence.Persistence;
+import javax.persistence.EntityManager;
 
 /**
  * Base class for implementing builders with persistence in test classes.
@@ -9,14 +9,19 @@ import javax.persistence.Persistence;
  *
  * @author Anthony Richir
  */
-public abstract class AbstractPersistenceTestBuilder<T> extends AbstractTestBuilder<T> {
+public abstract class AbstractPersistenceTestBuilder<T> {
 
-	public T buildAndPersist() {
-		T target = build();
-		Persistence.createEntityManagerFactory(getPersistenceUnitName()).createEntityManager()
-				.persist(target);
-		return target;
+	private final EntityManager em;
+ 
+	public AbstractPersistenceTestBuilder(EntityManager em) {
+	   this.em = em;
 	}
-
-	protected abstract String getPersistenceUnitName();
-}
+ 
+	public T buildAndPersist() {
+	   T target = build(); // Builds the object via the implementation provided by the concrete class
+	   em.persist(target); // Persists the created object
+	   return target; // Returns the instance linked to the persistence context
+	}
+ 
+	public abstract T build();
+ }
